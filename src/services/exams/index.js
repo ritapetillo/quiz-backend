@@ -33,18 +33,21 @@ examsRoutes.get("/", async (req, res, next) => {
 //start a new exams
 examsRoutes.post("/start", async (req, res, next) => {
   const { totalDuration } = req.body;
+  let duration = 0;
+  let index = 0;
   try {
     const allQuestions = await Question.find();
     //generate 5 random questions
     let questions = [];
     while (questions.length <= 4) {
-      const index = getRandomInt(allQuestions.length);
-      let duration = +allQuestions[index].duration;
+      do {
+        index = getRandomInt(allQuestions.length);
+        console.log(index);
+      } while (duration + allQuestions[index].duration > totalDuration);
+      duration = duration + allQuestions[index].duration;
       console.log(duration);
-      if (
-        !questions.includes(allQuestions[index]._id) &&
-        duration < totalDuration
-      )
+      console.log(totalDuration);
+      if (!questions.includes(allQuestions[index]._id))
         questions.push(allQuestions[index]._id);
     }
     //create the array object for the exam
