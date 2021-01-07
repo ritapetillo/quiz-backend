@@ -5,6 +5,7 @@ const error_handler = require("node-error-handler");
 const cors = require("cors");
 const examRoutes = require("./services/exams");
 const questionRoutes = require("./services/questions");
+const usersRoutes = require("./services/users");
 
 //connect to db
 mongoose
@@ -21,6 +22,7 @@ server.use(cors());
 //routes
 server.use("/exams", examRoutes);
 server.use("/questions", questionRoutes);
+server.use("/users", usersRoutes);
 //error handler
 server.use(error_handler({ log: true, debug: true }));
 

@@ -11,7 +11,7 @@ const UserSchema = new mongoose.Schema({
     default: "student",
   },
   avatar: String,
-  exams: { type: Schema.Types.ObjectId, ref: "bookings" },
+  exams: { type: Schema.Types.ObjectId, ref: "exams" },
   createdAt: {
     type: Date,
     default: Date.now(),
@@ -20,7 +20,6 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
-  reviews: [{ type: Schema.Types.ObjectId, ref: "reviews" }],
 });
 
 module.exports = mongoose.model("users", UserSchema);

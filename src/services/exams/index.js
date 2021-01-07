@@ -8,6 +8,8 @@ const validationMiddleware = require("../../lib/validationMiddleware");
 const getRandomInt = (max) => {
   return Math.floor(Math.random() * Math.floor(max));
 };
+const auth = require("../../lib/privateRoutes");
+
 //routes
 
 //GET /exams
@@ -31,18 +33,20 @@ examsRoutes.get("/", async (req, res, next) => {
 
 //POST /exams/start
 //start a new exams
-examsRoutes.post("/start", async (req, res, next) => {
+examsRoutes.post("/start", auth, async (req, res, next) => {
   const { totalDuration } = req.body;
   let duration = 0;
   let index = 0;
   try {
     const allQuestions = await Question.find();
+    console.log(allQuestions);
     //generate 5 random questions
     let questions = [];
     while (questions.length <= 4) {
       do {
-        index = getRandomInt(allQuestions.length);
+        index = await getRandomInt(allQuestions.length);
         console.log(index);
+        console.log(duration + allQuestions[index].duration > totalDuration);
       } while (duration + allQuestions[index].duration > totalDuration);
       duration = duration + allQuestions[index].duration;
       console.log(duration);
@@ -50,6 +54,7 @@ examsRoutes.post("/start", async (req, res, next) => {
       if (!questions.includes(allQuestions[index]._id))
         questions.push(allQuestions[index]._id);
     }
+
     //create the array object for the exam
     questions = questions.map((question) => ({
       question: question,
@@ -61,6 +66,7 @@ examsRoutes.post("/start", async (req, res, next) => {
     const answerS = await newAnswerSheet.save();
     const newExam = new Exam({
       ...req.body,
+      candidate: req.user._id,
       questions,
       answerSheet: answerS._id,
     });
@@ -135,6 +141,7 @@ examsRoutes.post("/:id/score", async (req, res, next) => {
   const { id } = req.params;
   try {
     const allQuestions = await Question.find();
+    const exam = await Exam.findById(id);
     let answerSheet = await AnswerSheet.findOne({ exam_id: id });
     let corrected = answerSheet.answers.filter((answer) => {
       return allQuestions.some(
@@ -143,6 +150,8 @@ examsRoutes.post("/:id/score", async (req, res, next) => {
       );
     });
     const score = await corrected.length;
+    exam.score = score;
+    exam.save();
     console.log(corrected.length);
     res.send(score.toString());
   } catch (err) {

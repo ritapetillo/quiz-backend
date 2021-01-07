@@ -2,10 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const ExamSchema = new mongoose.Schema({
-  candidateName: {
-    type: String,
-    required: true,
-  },
+  candidate: { type: Schema.Types.ObjectId, ref: "users" },
   examDate: {
     type: Date,
     default: Date.now(),
@@ -26,6 +23,10 @@ const ExamSchema = new mongoose.Schema({
     },
   ],
   answerSheet: { type: Schema.Types.ObjectId, ref: "answerSheets" },
+  score: {
+    type: Number,
+    default: 0,
+  },
 });
 
 module.exports = mongoose.model("exams", ExamSchema);
