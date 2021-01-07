@@ -34,12 +34,13 @@ examsRoutes.get("/", async (req, res, next) => {
 //POST /exams/start
 //start a new exams
 examsRoutes.post("/start", auth, async (req, res, next) => {
+  console.log(req.user.id);
   const { totalDuration } = req.body;
   let duration = 0;
   let index = 0;
   try {
     const allQuestions = await Question.find();
-    console.log(allQuestions);
+
     //generate 5 random questions
     let questions = [];
     while (questions.length <= 4) {
@@ -66,7 +67,7 @@ examsRoutes.post("/start", auth, async (req, res, next) => {
     const answerS = await newAnswerSheet.save();
     const newExam = new Exam({
       ...req.body,
-      candidate: req.user._id,
+      candidate: req.user.id,
       questions,
       answerSheet: answerS._id,
     });
@@ -96,7 +97,8 @@ examsRoutes.get("/:id", async (req, res, next) => {
           model: "questions",
         },
       })
-      .populate("answerSheet");
+      .populate("answerSheet")
+      .populate("candidate");
     res.send(exam);
   } catch (err) {
     const error = new Error("there is a probelm finding exams");

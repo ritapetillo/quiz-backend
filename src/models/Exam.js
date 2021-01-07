@@ -2,11 +2,11 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const ExamSchema = new mongoose.Schema({
-  candidate: { type: Schema.Types.ObjectId, ref: "users" },
   examDate: {
     type: Date,
     default: Date.now(),
   },
+  candidate: { type: Schema.Types.ObjectId, ref: "users" },
   isCompleted: {
     type: Boolean,
     default: false,
