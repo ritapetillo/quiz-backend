@@ -109,10 +109,15 @@ examsRoutes.get("/:id", async (req, res, next) => {
 
 //POST /exam/{id}/answer;
 //get exam by id
-examsRoutes.post("/:id/answer", async (req, res, next) => {
+examsRoutes.post("/:id/answer", auth, async (req, res, next) => {
   const { id } = req.params;
   const { question, answer } = req.body;
   try {
+    const exam = await Exam.findById(id);
+    console.log(req.user.id);
+    if (exam.candidate != req.user.id) {
+      return next(new Error("Not Autorized"));
+    }
     let answerSheet = await AnswerSheet.findOne({ exam_id: id });
     const responded = answerSheet.answers.some(
       (answer) => answer.question == question
@@ -139,11 +144,15 @@ examsRoutes.post("/:id/answer", async (req, res, next) => {
 
 //POST /exam/{id}/answer;
 //get exam by id
-examsRoutes.post("/:id/score", async (req, res, next) => {
+examsRoutes.post("/:id/score", auth, async (req, res, next) => {
   const { id } = req.params;
   try {
-    const allQuestions = await Question.find();
     const exam = await Exam.findById(id);
+    console.log(req.user.id);
+    if (exam.candidate != req.user.id) {
+      return next(new Error("Not Autorized"));
+    }
+    const allQuestions = await Question.find();
     let answerSheet = await AnswerSheet.findOne({ exam_id: id });
     let corrected = answerSheet.answers.filter((answer) => {
       return allQuestions.some(
