@@ -16,6 +16,7 @@ const auth = require("../../lib/privateRoutes");
 //get all the exams
 examsRoutes.get("/", async (req, res, next) => {
   try {
+
     const exams = await Exam.find().populate({
       path: "questions",
       populate: {
@@ -89,6 +90,7 @@ examsRoutes.post("/start", auth, async (req, res, next) => {
 examsRoutes.get("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
+    
     const exam = await Exam.findById(id)
       .populate({
         path: "questions",
@@ -99,6 +101,9 @@ examsRoutes.get("/:id", async (req, res, next) => {
       })
       .populate("answerSheet")
       .populate("candidate");
+    if (req.query.answers) {
+      res.send(exam.answerSheet);
+    }
     res.send(exam);
   } catch (err) {
     const error = new Error("there is a probelm finding exams");
